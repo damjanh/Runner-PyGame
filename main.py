@@ -62,13 +62,21 @@ ground_surface = pygame.image.load('graphics/ground.png').convert()
 
 # Obstacles
 snail_start_pos_x = 800
-snail_surface = pygame.image.load('graphics/enemy/snail1.png').convert_alpha()
+snail_frame_1 = pygame.image.load('graphics/enemy/snail1.png').convert_alpha()
+snail_frame_2 = pygame.image.load('graphics/enemy/snail2.png').convert_alpha()
+snail_frames = [snail_frame_1, snail_frame_2]
+snail_frame_index = 0
+snail_surface = snail_frames[snail_frame_index]
 
-fly_surface = pygame.image.load('graphics/enemy/Fly1.png').convert_alpha()
-
+fly_frame_1 = pygame.image.load('graphics/enemy/Fly1.png').convert_alpha()
+fly_frame_2 = pygame.image.load('graphics/enemy/Fly2.png').convert_alpha()
+fly_frames = [fly_frame_1, fly_frame_2]
+fly_frame_index = 0
+fly_surface = fly_frames[fly_frame_index]
 
 obstacle_rectangle_list = []
 
+# Player
 player_walk_1 = pygame.image.load('graphics/player/player_walk_1.png').convert_alpha()
 player_walk_2 = pygame.image.load('graphics/player/player_walk_2.png').convert_alpha()
 player_walk = [player_walk_1, player_walk_2]
@@ -83,15 +91,21 @@ player_stand_surface = pygame.image.load('graphics/player/player_stand.png').con
 player_stand_surface = pygame.transform.rotozoom(player_stand_surface, 0, 2)
 player_stand_rectangle = player_stand_surface.get_rect(center=(400, 200))
 
+# Text
 game_name_surface = font.render('Runner', False, (111, 196, 169))
 game_name_rectangle = game_name_surface.get_rect(center=(400, 80))
 
 game_message_surface = font.render("Press SPACE to start!", False, (111, 196, 169))
 game_message_rectangle = game_message_surface.get_rect(center=(400, 330))
 
-# Timer
+# Timers
 obstacle_timer = pygame.USEREVENT + 1
+snail_animation_timer = pygame.USEREVENT + 2
+fly_animation_timer = pygame.USEREVENT + 3
+
 pygame.time.set_timer(obstacle_timer, 1400)
+pygame.time.set_timer(snail_animation_timer, 500)
+pygame.time.set_timer(fly_animation_timer, 200)
 
 
 while True:
@@ -108,11 +122,24 @@ while True:
                 game_active = True
                 start_time = pygame.time.get_ticks()
 
-        if event.type == obstacle_timer and game_active:
-            if randint(0,2):
-                obstacle_rectangle_list.append(snail_surface.get_rect(bottomright=(randint(900, 1100), 300)))
-            else:
-                obstacle_rectangle_list.append(fly_surface.get_rect(bottomright=(randint(900, 1100), 210)))
+        if game_active:
+            if event.type == obstacle_timer:
+                if randint(0, 2):
+                    obstacle_rectangle_list.append(snail_surface.get_rect(bottomright=(randint(900, 1100), 300)))
+                else:
+                    obstacle_rectangle_list.append(fly_surface.get_rect(bottomright=(randint(900, 1100), 210)))
+            elif event.type == snail_animation_timer:
+                if snail_frame_index == 0:
+                    snail_frame_index = 1
+                else:
+                    snail_frame_index = 0
+                snail_surface = snail_frames[snail_frame_index]
+            elif event.type == fly_animation_timer:
+                if fly_frame_index == 0:
+                    fly_frame_index = 1
+                else:
+                    fly_frame_index = 0
+                fly_surface = fly_frames[fly_frame_index]
 
     if game_active:
         screen.blit(sky_surface, (0, 0))
